@@ -158,6 +158,133 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-android-编译" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/25/android-编译/">Android Gradle 编译总结</a>
+    </h1>
+  
+
+        
+        <a href="/2017/03/25/android-编译/" class="archive-article-date">
+  	<time datetime="2017-03-25T04:07:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>Android Studio的编译时间非常长，提示一直在解决模块依赖，点击sync按钮同步第三方代码的时候也是巨慢,所以研究一下Androidstudio 编译过程</p>
+</blockquote>
+<p>先说说gradle 的生命周期吧，gradle 构建一个工程主要分为三部分（完全掌握了下面这张图，整个 gradle 的构建过程能了解个十之七八了）：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1212336-5ab3ae4bc237b401.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Paste_Image.png"></p>
+<ol>
+<li>初始化阶段：主要是解析 setting.gradle 文件（因此有人提到减少 setting.gradle 的 module 数量，是很有道理的，但是实际操作过程限制颇多，原因最后会大致说一下）；</li>
+<li>读取配置阶段：主要是解析所有的 projects 下的 build.gradle 文件，包括 rootProject 和其他的 subprojects（子项目），检查语法，确定 tasks 依赖以建立 task 的有向无循环图，检查 task 里引用的文件目录是否存在等（这一步也进一步验证了减少 setting.gradle 里的 module 数量可以加快编译速度，因为减少一个 module ，需要解析的 build.gradle 文件就减少一个，第 3 步里就不会执行本属于这个 module 的任务了，但是还是 1 里面说的问题，限制颇多）；</li>
+<li><p>阶段：按照 2 中建立的有向无循环图来执行每一个 task ，整个编译过程中，这一步基本会占去 9 成以上的时间，尤其是对于 Android 项目来讲，将 java 转为 class.</p>
+<blockquote>
+<p>compileDebugJavaWithJavac/compileReleaseJavaWithJavac</p>
+</blockquote>
+<p>和将 class 合并成 dex </p>
+<blockquote>
+<p>transformClassesWithDexForDebug/transformClassesWithDexForRelease</p>
+</blockquote>
+<p>这两步很耗时，第一步还好，第二步会耗时非常久。首先在 gradle.properties 里设置 </p>
+<blockquote>
+<p>org.gradle.jvmargs=-Xmx4096m //越大越好</p>
+</blockquote>
+<p>然后在工程的 build.gradle 里的 android 结点下增加 dexOptions 配置，如下：</p>
+<blockquote>
+<p>dexOptions {<br> dexInProcess true<br> preDexLibraries true<br> javaMaxHeapSize “4g”//越大越好<br> incremental true<br>}</p>
+</blockquote>
+</li>
+</ol>
+<p>明确了 gradle 的生命周期，那么就可以看到加快编译速度的关键就是从第三步入手，当然，减少 setting.gradle 里的 modules 数量这一步也是必须的</p>
+<blockquote>
+<p>在gradle中引用第三方模块时采用maven方式依赖，每次打开Android Studio或者点击sync按钮时，都会去maven中央仓库去取第三方的库文件,一般是jar或者aar文件,如果本地没有该文件，则下载回来，由于通过网络访问Android Studio默认的maven中央仓库jcenter很慢，因此就导致同步会非常耗时，尤其是第一次同步，或者clean后重新build的时候，一般都会在十分钟左右，即使库文件已经下载到本地了，也会去访问maven仓库的，因此当过多的通过maven方式依赖第三方库的时候Android Studio就会非常慢</p>
+</blockquote>
+<p>###解决办法<br>方法一：</p>
+<blockquote>
+<p>(1) 当第一次同步代码后，第三方库都下载到本地了，将gradle设置为offline模式，这样下次就不必访问网络了，这样同步速度从几分钟缩短到几秒钟，但缺点是一旦引入新的maven依赖，本地不存在这个库文件，还是得去访问网络，同样同步慢</p>
+</blockquote>
+<p>方法二：</p>
+<blockquote>
+<p>(2) 自己搭建maven仓库，将常用的第三方库放在自己搭建的maven服务器上，这样访问内部的maven服务器就快多了，又方便分模块开发和打包，但这样对服务器的管理麻烦，技术含量高，比较适合需要分模块开发的大型项目，而且当多个模块开发不同步，需要对模块分版本进行依赖、打包、发布的时候，必须采用这种方式，例如：模块A已经开发完毕，模块B正在开发，但这个时候要发版本了，怎么办呢？解决办法就是依赖模块B的上个版本，也就是上个版本的aar文件</p>
+</blockquote>
+<p>方法三：</p>
+<blockquote>
+<p>(3) 将第三方库下载到本地，然后将代码复制到自己的项目中，这种方法是在代码级别上直接使用别人的代码，优点是再也不用依赖别人的库，项目模块少，库与自己项目融为一体，缺点是复制的时候太辛苦了，不仅要复制代码文件，还要复制资源文件，容易出错，另外耦合比较严重，删除这个库的时候也非常麻烦，同时别人的代码也破坏了自己的代码风格和命名规范</p>
+</blockquote>
+<p>方法四：</p>
+<blockquote>
+<p>(4) <strong>推荐的方法是：尽量使用第三方库的jar、aar文件导入自己的项目，或者将第三方库下载到本地，然后当做一个本地模块导入自己的项目，不要再使用gradle中的maven依赖了</strong><br>这样就不用苦逼的去复制代码，删除的时候也很方便,只需删除模块即可，实现模块即插即用，缺点是会导致项目的模块太多，不美观，以及很多eclipse写的库导入Android Studio后还要自己修改才能编译通过，很多库是Android工程，不是标准意义的Android library,<br>好在现在很多有名的库都专门提供了library，直接导入即可，还有Android Studio已经可以直接将eclipse工程当做一个module导入了,所以这种方法还是很简单的<br>这种方法也就是以前eclipse使用第三方库的方法</p>
+</blockquote>
+<p>上面讲到的几点，现有环境就可以做到的大概是这样（有一点要特别注意，如果工程里有交叉依赖，一定不要使用 –parallel 参数）：</p>
+<blockquote>
+<p>gradle assembleDebug –daemon –parallel -x lint -x test</p>
+</blockquote>
+<p>如果是要直接安装到设备上的话，就把 assembleDebug 换成 installDebug ，assembleDebug 可以简写为 asD ，installDebug 可以简写为 iD </p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">编译</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">gradle</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/03/25/android-编译/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-hello-world" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -304,6 +431,14 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">编译</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">gradle</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
