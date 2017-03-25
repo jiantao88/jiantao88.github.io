@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="Life's a Struggle">
 <meta property="og:description" content="Android Gradle 编译总结。">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1212336-5ab3ae4bc237b401.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-03-25T04:16:28.000Z">
+<meta property="og:updated_time" content="2017-03-25T04:53:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android Gradle 编译总结">
 <meta name="twitter:description" content="Android Gradle 编译总结。">
@@ -36,6 +36,16 @@
   
 
   
+<script>
+var _hmt = _hmt || [];
+(function() {
+	var hm = document.createElement("script");
+	hm.src = "https://hm.baidu.com/hm.js?https://hm.baidu.com/hm.js?250b913a43b222f6d64180fa0123cf6e";
+	var s = document.getElementsByTagName("script")[0]; 
+	s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
 
 </head>
 
@@ -209,7 +219,8 @@
 <blockquote>
 <p>在gradle中引用第三方模块时采用maven方式依赖，每次打开Android Studio或者点击sync按钮时，都会去maven中央仓库去取第三方的库文件,一般是jar或者aar文件,如果本地没有该文件，则下载回来，由于通过网络访问Android Studio默认的maven中央仓库jcenter很慢，因此就导致同步会非常耗时，尤其是第一次同步，或者clean后重新build的时候，一般都会在十分钟左右，即使库文件已经下载到本地了，也会去访问maven仓库的，因此当过多的通过maven方式依赖第三方库的时候Android Studio就会非常慢</p>
 </blockquote>
-<p>###解决办法<br>方法一：</p>
+<p>###解决办法<br><a id="more"></a></p>
+<p>方法一：</p>
 <blockquote>
 <p>(1) 当第一次同步代码后，第三方库都下载到本地了，将gradle设置为offline模式，这样下次就不必访问网络了，这样同步速度从几分钟缩短到几秒钟，但缺点是一旦引入新的maven依赖，本地不存在这个库文件，还是得去访问网络，同样同步慢</p>
 </blockquote>
@@ -246,6 +257,11 @@
                   <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
                   <div class="reward-box">
                     
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://on3m9el2o.bkt.clouddn.com/wechar.jpeg">
+                      <span class="reward-type">微信</span>
+                    </div>
                     
                   </div>
                 </span>
@@ -349,11 +365,15 @@
   
 <nav id="article-nav">
   
-  
-    <a href="/2017/03/18/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Hello World</div>
-      <i class="icon-circle-right"></i>
+    <a href="/2017/03/25/Android MVVM框架/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Android MVVM框架
+        
+      </div>
     </a>
+  
   
 </nav>
 
@@ -453,6 +473,14 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">源码</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">架构</a>
+              </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">编译</a>

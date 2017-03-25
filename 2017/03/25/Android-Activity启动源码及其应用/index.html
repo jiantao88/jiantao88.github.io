@@ -6,17 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://www.jtsource.com">
-  <title>Life&#39;s a Struggle</title>
+  <title>Android Activity启动源码及其应用 | Life&#39;s a Struggle</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="学习总结 思考感悟 知识管理">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Life's a Struggle">
-<meta property="og:url" content="http://www.jtsource.com/index.html">
+  <meta name="description" content="开发中经常遇到使用Activity ，网上关于讲解其原理的也很多，但是都是零零散散，今天想做个总结，并且也提高一下自己对源码的认识
+
+Acitivity 启动过程   先看入口   最常用的Activity 启动过程是12345678910111213141516171819@Overridepublic void startActivity(Intent intent) &amp;#123;	star">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Activity启动源码及其应用">
+<meta property="og:url" content="http://www.jtsource.com/2017/03/25/Android-Activity启动源码及其应用/index.html">
 <meta property="og:site_name" content="Life's a Struggle">
-<meta property="og:description" content="学习总结 思考感悟 知识管理">
+<meta property="og:description" content="开发中经常遇到使用Activity ，网上关于讲解其原理的也很多，但是都是零零散散，今天想做个总结，并且也提高一下自己对源码的认识
+
+Acitivity 启动过程   先看入口   最常用的Activity 启动过程是12345678910111213141516171819@Overridepublic void startActivity(Intent intent) &amp;#123;	star">
+<meta property="og:updated_time" content="2017-03-25T04:57:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Life's a Struggle">
-<meta name="twitter:description" content="学习总结 思考感悟 知识管理">
+<meta name="twitter:title" content="Android Activity启动源码及其应用">
+<meta name="twitter:description" content="开发中经常遇到使用Activity ，网上关于讲解其原理的也很多，但是都是零零散散，今天想做个总结，并且也提高一下自己对源码的认识
+
+Acitivity 启动过程   先看入口   最常用的Activity 启动过程是12345678910111213141516171819@Overridepublic void startActivity(Intent intent) &amp;#123;	star">
   
     <link rel="alternative" href="/atom.xml" title="Life&#39;s a Struggle" type="application/atom+xml">
   
@@ -166,146 +173,14 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="post-Activity LaunchMode源码分析" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+            <article id="post-Android-Activity启动源码及其应用" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/25/Activity LaunchMode源码分析/">Activity LaunchMode源码分析</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/25/Activity LaunchMode源码分析/" class="archive-article-date">
-  	<time datetime="2017-03-25T04:44:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>之前一篇文章分析了<a href="http://www.jianshu.com/writer#/notebooks/2468592/notes">Android Activity启动过程源码</a> 这里单独拿出来一篇文章分析Activity 启动模式的源码</p>
-</blockquote>
-<p>我们知道Activity的start是走到Instrumentation的execStartActivity方法中，而这里是调用了ActivityManagerNative的getDefault方法 来获得一个ActivityManagerService(以下简称AMS)的远程代理对象，要走到AMS的startActivity方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">int result = ActivityManagerNative.getDefault()</div><div class="line">	.startActivity(whoThread, who.getBasePackageName(), intent,</div><div class="line">			intent.resolveTypeIfNeeded(who.getContentResolver()),</div><div class="line">			token, target != null ? target.mEmbeddedID : null,</div><div class="line">			requestCode, 0, null, null, options);</div><div class="line">checkStartActivityResult(result, intent);</div></pre></td></tr></table></figure></p>
-<p>这里先解释一下startActivity方法里的一些参数</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">参数</th>
-<th style="text-align:center">作用    </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">whoThread</td>
-<td style="text-align:center">IApplicationThread的binder对象 用于AMS进行进程间通信</td>
-</tr>
-<tr>
-<td style="text-align:center">who</td>
-<td style="text-align:center">上下文对象 其实就是Activity</td>
-</tr>
-<tr>
-<td style="text-align:center">intent</td>
-<td style="text-align:center">目标intent</td>
-</tr>
-<tr>
-<td style="text-align:center">intent.resolveTypeIfneed</td>
-<td style="text-align:center">若没有在Manifest文件里面注明Activity的mime类型，返回null</td>
-</tr>
-<tr>
-<td style="text-align:center">token</td>
-<td style="text-align:center">Binder对象  <strong>通过它可以获得Activity的相关信息 后边会保存到sourceRecord这个对象里面</strong></td>
-</tr>
-<tr>
-<td style="text-align:center">target</td>
-<td style="text-align:center">我们调用的Activity</td>
-</tr>
-<tr>
-<td style="text-align:center">requestCode</td>
-<td style="text-align:center">若没有设置结果就是小于0</td>
-</tr>
-<tr>
-<td style="text-align:center">0</td>
-<td style="text-align:center">flags</td>
-</tr>
-<tr>
-<td style="text-align:center">ProfilerInfo</td>
-<td style="text-align:center">null</td>
-</tr>
-<tr>
-<td style="text-align:center">options</td>
-<td style="text-align:center">是一个bunder对象，记录用intent传递的信息</td>
-</tr>
-</tbody>
-</table>
-<p>这里对应着AMS 中startactivity的参数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public final int startActivity(IApplicationThread caller, String callingPackage,</div><div class="line">        Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,</div><div class="line">        int startFlags, ProfilerInfo profilerInfo, Bundle options) &#123;</div><div class="line">    return startActivityAsUser(caller, callingPackage, intent, resolvedType, resultTo,</div><div class="line">        resultWho, requestCode, startFlags, profilerInfo, options,</div><div class="line">        UserHandle.getCallingUserId());</div><div class="line">&#125;</div><div class="line">@Override</div><div class="line">public final int startActivityAsUser(IApplicationThread caller, String callingPackage,</div><div class="line">        Intent intent, String resolvedType, IBinder resultTo, String resultWho, int requestCode,</div><div class="line">        int startFlags, ProfilerInfo profilerInfo, Bundle options, int userId) &#123;</div><div class="line">    enforceNotIsolatedCaller(&quot;startActivity&quot;);</div><div class="line">    userId = handleIncomingUser(Binder.getCallingPid(), Binder.getCallingUid(), userId,</div><div class="line">            false, ALLOW_FULL_ONLY, &quot;startActivity&quot;, null);</div><div class="line">    // TODO: Switch to user app stacks here.</div><div class="line">    return mStackSupervisor.startActivityMayWait(caller, -1, callingPackage, intent,</div><div class="line">            resolvedType, null, null, resultTo, resultWho, requestCode, startFlags,</div><div class="line">            profilerInfo, null, null, options, userId, null, null);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-        
-          <a class="article-more-a" href="/2017/03/25/Activity LaunchMode源码分析/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">源码</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/25/Activity LaunchMode源码分析/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-    <article id="post-Android-Activity启动源码及其应用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/25/Android-Activity启动源码及其应用/">Android Activity启动源码及其应用</a>
+    <h1 class="article-title" itemprop="name">
+      Android Activity启动源码及其应用
     </h1>
   
 
@@ -694,6 +569,32 @@ return activity;
       
 
       
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="http://on3m9el2o.bkt.clouddn.com/wechar.jpeg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
     </div>
     <div class="article-info article-info-index">
       
@@ -723,18 +624,83 @@ return activity;
 
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/25/Android-Activity启动源码及其应用/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://www.jtsource.com/2017/03/25/Android-Activity启动源码及其应用/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
 
-
+  
+<nav id="article-nav">
+  
+    <a href="/2017/03/25/Activity LaunchMode源码分析/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Activity LaunchMode源码分析
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/03/25/Android MVVM框架/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Android MVVM框架</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
 
 
@@ -742,194 +708,10 @@ return activity;
 
 
   
-    <article id="post-Android MVVM框架" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/25/Android MVVM框架/">Android MVVM框架</a>
-    </h1>
+    <div class="duoshuo"></div>
   
 
-        
-        <a href="/2017/03/25/Android MVVM框架/" class="archive-article-date">
-  	<time datetime="2017-03-25T04:44:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>##一：android 分层框架概述<br>目前项目中因为Controller(Activity)和View,Model没有实现解耦，造成Activity既要负责处理业务逻辑，又要负责UI显示，数据绑定，所以造成Activity里代码过多，逻辑不清楚，对代码的可读性，可维护性不是很好，所以采用一些分层模式，可以更为有效的对业务逻辑层，UI显示层，数据层进行拆分，集中分层模式有：<br>使用的最多的是MVC和MVP。其中MVC出现与上世纪70年代，在三十多年的工程实践中，MVC充分证明了它的成功，同时在漫长的时间中演变出了许多变种，其中也包括MVP.MVC和MVP最大的差别在与控制层对于整个框架的控制力上。而MVVM可以算是MVP的升级版，其中的VM是ViewModel的缩写，ViewModel可以理解成是View的数据模型和Presenter的合体，ViewModel和View之间的交互通过Data Binding完成，而Data Binding可以实现双向的交互，这就使得视图和控制层之间的耦合程度进一步降低，关注点分离更为彻底，同时减轻了Activity的压力，三者之间的差别如下：</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1212336-f662ba2871abba8c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="MVVM.png"></p>
-<p>##二：android MVVM框架实现 Robobinding<br>Android平台上有一些比较好的MVVM框架，其中用的比较多的是RoboBinding,Robobinding有如下特点：</p>
-<p>为了精简框架，RoboBinding移除了大量不必要的代码，比如addXXListener()，findViewById()等。<br>可以将难以测试的Android代码转换为普通的JUnit测试。<br>提供对象类型Cursor来替换 - 关系类型Cursor，因为我们已经习惯于操作对象 。<br>可以很容易的为任何自定义组件，第三方组件或Android widget编写属性绑定实现，简化代码，使项目易于维护。<br>
-        
-          <a class="article-more-a" href="/2017/03/25/Android MVVM框架/#more">more >></a>
-        
-      
 
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">架构</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/25/Android MVVM框架/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-    <article id="post-android-编译" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/25/android-编译/">Android Gradle 编译总结</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/25/android-编译/" class="archive-article-date">
-  	<time datetime="2017-03-25T04:07:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>Android Studio的编译时间非常长，提示一直在解决模块依赖，点击sync按钮同步第三方代码的时候也是巨慢,所以研究一下Androidstudio 编译过程</p>
-</blockquote>
-<p>先说说gradle 的生命周期吧，gradle 构建一个工程主要分为三部分（完全掌握了下面这张图，整个 gradle 的构建过程能了解个十之七八了）：</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1212336-5ab3ae4bc237b401.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Paste_Image.png"></p>
-<ol>
-<li>初始化阶段：主要是解析 setting.gradle 文件（因此有人提到减少 setting.gradle 的 module 数量，是很有道理的，但是实际操作过程限制颇多，原因最后会大致说一下）；</li>
-<li>读取配置阶段：主要是解析所有的 projects 下的 build.gradle 文件，包括 rootProject 和其他的 subprojects（子项目），检查语法，确定 tasks 依赖以建立 task 的有向无循环图，检查 task 里引用的文件目录是否存在等（这一步也进一步验证了减少 setting.gradle 里的 module 数量可以加快编译速度，因为减少一个 module ，需要解析的 build.gradle 文件就减少一个，第 3 步里就不会执行本属于这个 module 的任务了，但是还是 1 里面说的问题，限制颇多）；</li>
-<li><p>阶段：按照 2 中建立的有向无循环图来执行每一个 task ，整个编译过程中，这一步基本会占去 9 成以上的时间，尤其是对于 Android 项目来讲，将 java 转为 class.</p>
-<blockquote>
-<p>compileDebugJavaWithJavac/compileReleaseJavaWithJavac</p>
-</blockquote>
-<p>和将 class 合并成 dex </p>
-<blockquote>
-<p>transformClassesWithDexForDebug/transformClassesWithDexForRelease</p>
-</blockquote>
-<p>这两步很耗时，第一步还好，第二步会耗时非常久。首先在 gradle.properties 里设置 </p>
-<blockquote>
-<p>org.gradle.jvmargs=-Xmx4096m //越大越好</p>
-</blockquote>
-<p>然后在工程的 build.gradle 里的 android 结点下增加 dexOptions 配置，如下：</p>
-<blockquote>
-<p>dexOptions {<br> dexInProcess true<br> preDexLibraries true<br> javaMaxHeapSize “4g”//越大越好<br> incremental true<br>}</p>
-</blockquote>
-</li>
-</ol>
-<p>明确了 gradle 的生命周期，那么就可以看到加快编译速度的关键就是从第三步入手，当然，减少 setting.gradle 里的 modules 数量这一步也是必须的</p>
-<blockquote>
-<p>在gradle中引用第三方模块时采用maven方式依赖，每次打开Android Studio或者点击sync按钮时，都会去maven中央仓库去取第三方的库文件,一般是jar或者aar文件,如果本地没有该文件，则下载回来，由于通过网络访问Android Studio默认的maven中央仓库jcenter很慢，因此就导致同步会非常耗时，尤其是第一次同步，或者clean后重新build的时候，一般都会在十分钟左右，即使库文件已经下载到本地了，也会去访问maven仓库的，因此当过多的通过maven方式依赖第三方库的时候Android Studio就会非常慢</p>
-</blockquote>
-<p>###解决办法<br>
-        
-          <a class="article-more-a" href="/2017/03/25/android-编译/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">编译</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">gradle</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/25/android-编译/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-  
 
 
           </div>
@@ -951,8 +733,8 @@ return activity;
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
