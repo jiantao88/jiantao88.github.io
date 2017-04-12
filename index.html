@@ -298,6 +298,84 @@ var _hmt = _hmt || [];
 
 
   
+    <article id="post-Android MVVM框架" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/03/25/Android MVVM框架/">Android MVVM框架</a>
+    </h1>
+  
+
+        
+        <a href="/2017/03/25/Android MVVM框架/" class="archive-article-date">
+  	<time datetime="2017-03-25T04:44:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>##一：android 分层框架概述<br>目前项目中因为Controller(Activity)和View,Model没有实现解耦，造成Activity既要负责处理业务逻辑，又要负责UI显示，数据绑定，所以造成Activity里代码过多，逻辑不清楚，对代码的可读性，可维护性不是很好，所以采用一些分层模式，可以更为有效的对业务逻辑层，UI显示层，数据层进行拆分，集中分层模式有：<br>使用的最多的是MVC和MVP。其中MVC出现与上世纪70年代，在三十多年的工程实践中，MVC充分证明了它的成功，同时在漫长的时间中演变出了许多变种，其中也包括MVP.MVC和MVP最大的差别在与控制层对于整个框架的控制力上。而MVVM可以算是MVP的升级版，其中的VM是ViewModel的缩写，ViewModel可以理解成是View的数据模型和Presenter的合体，ViewModel和View之间的交互通过Data Binding完成，而Data Binding可以实现双向的交互，这就使得视图和控制层之间的耦合程度进一步降低，关注点分离更为彻底，同时减轻了Activity的压力，三者之间的差别如下：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1212336-f662ba2871abba8c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="MVVM.png"></p>
+<p>##二：android MVVM框架实现 Robobinding<br>Android平台上有一些比较好的MVVM框架，其中用的比较多的是RoboBinding,Robobinding有如下特点：</p>
+<p>为了精简框架，RoboBinding移除了大量不必要的代码，比如addXXListener()，findViewById()等。<br>可以将难以测试的Android代码转换为普通的JUnit测试。<br>提供对象类型Cursor来替换 - 关系类型Cursor，因为我们已经习惯于操作对象 。<br>可以很容易的为任何自定义组件，第三方组件或Android widget编写属性绑定实现，简化代码，使项目易于维护。<br>
+        
+          <a class="article-more-a" href="/2017/03/25/Android MVVM框架/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">架构</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+	<div class="article-category tagcloud">
+		<i class="icon-book icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2017/03/25/Android MVVM框架/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-Android-Activity启动源码及其应用" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -364,84 +442,6 @@ var _hmt = _hmt || [];
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2017/03/25/Android-Activity启动源码及其应用/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-    <article id="post-Android MVVM框架" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/03/25/Android MVVM框架/">Android MVVM框架</a>
-    </h1>
-  
-
-        
-        <a href="/2017/03/25/Android MVVM框架/" class="archive-article-date">
-  	<time datetime="2017-03-25T04:44:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-03-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>##一：android 分层框架概述<br>目前项目中因为Controller(Activity)和View,Model没有实现解耦，造成Activity既要负责处理业务逻辑，又要负责UI显示，数据绑定，所以造成Activity里代码过多，逻辑不清楚，对代码的可读性，可维护性不是很好，所以采用一些分层模式，可以更为有效的对业务逻辑层，UI显示层，数据层进行拆分，集中分层模式有：<br>使用的最多的是MVC和MVP。其中MVC出现与上世纪70年代，在三十多年的工程实践中，MVC充分证明了它的成功，同时在漫长的时间中演变出了许多变种，其中也包括MVP.MVC和MVP最大的差别在与控制层对于整个框架的控制力上。而MVVM可以算是MVP的升级版，其中的VM是ViewModel的缩写，ViewModel可以理解成是View的数据模型和Presenter的合体，ViewModel和View之间的交互通过Data Binding完成，而Data Binding可以实现双向的交互，这就使得视图和控制层之间的耦合程度进一步降低，关注点分离更为彻底，同时减轻了Activity的压力，三者之间的差别如下：</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/1212336-f662ba2871abba8c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="MVVM.png"></p>
-<p>##二：android MVVM框架实现 Robobinding<br>Android平台上有一些比较好的MVVM框架，其中用的比较多的是RoboBinding,Robobinding有如下特点：</p>
-<p>为了精简框架，RoboBinding移除了大量不必要的代码，比如addXXListener()，findViewById()等。<br>可以将难以测试的Android代码转换为普通的JUnit测试。<br>提供对象类型Cursor来替换 - 关系类型Cursor，因为我们已经习惯于操作对象 。<br>可以很容易的为任何自定义组件，第三方组件或Android widget编写属性绑定实现，简化代码，使项目易于维护。<br>
-        
-          <a class="article-more-a" href="/2017/03/25/Android MVVM框架/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">架构</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-	<div class="article-category tagcloud">
-		<i class="icon-book icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="/categories/Android/" class="article-tag-list-link color3">Android</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2017/03/25/Android MVVM框架/">展开全文 >></a>
         </p>
       
 
